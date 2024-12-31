@@ -21,13 +21,6 @@ interface Direction {
   char: DirectionChar
 }
 
-const directions: Direction[] = [
-  { i: 0, j: 1, char: "R"},
-  { i: 1, j: 0, char: "D"},
-  { i: 0, j: -1, char: "L" },
-  { i: -1, j: 0, char: "U" }
-]
-
 const find_largest_prime_factor = (value: number): number => {
   let prime = 2
   while (value > 1) {
@@ -69,45 +62,49 @@ const spiralize_matrix = (matrix: number[][], ns: NS): number[] => {
 }
 
 const unique_paths_in_a_grid_ii = (grid: number[][], ns: NS): number => {
+  const directions: Direction[] = [
+    { i: 0, j: 1, char: "R"},
+    { i: 1, j: 0, char: "D"},
+  ]
   const height = grid.length
   const width = grid[0].length
   const root_coord = { i: 0, j: 0 }
   const target_coord = { i: height - 1, j: width - 1 }
   const queue: Coordinates[] = [root_coord]
 
+  let total = 0
+
   while (queue.length > 0) {
-    const curr = queue.pop() as 
-    grid[curr.coord.i][curr.coord.j] = -1
+    const curr = queue.pop() as Coordinates
     for (const direction of directions) {
       const new_coord = {
-        i: curr.coord.i + direction.i,
-        j: curr.coord.j + direction.j,
+        i: curr.i + direction.i,
+        j: curr.j + direction.j,
       }
 
       if (0 <= new_coord.i && new_coord.i < height
           && 0 <= new_coord.j && new_coord.j < width
           && grid[new_coord.i][new_coord.j] == 0) {
 
-        const new_path = curr.path + direction.char
-
-        const new_pos = {
-          coord: new_coord,
-          path: new_path
-        }
-
         if (new_coord.i === target_coord.i && new_coord.j === target_coord.j) {
-          found = true
-          path = new_path
+          total += 1
         } else {
-          queue.unshift(new_pos)
+          queue.unshift(new_coord)
         }
       }
     }
   }
-
+  return total 
 }
 
 const shortest_path_in_a_grid = (grid: number[][]): string => {
+  const directions: Direction[] = [
+    { i: 0, j: 1, char: "R"},
+    { i: 1, j: 0, char: "D"},
+    { i: 0, j: -1, char: "L" },
+    { i: -1, j: 0, char: "U" }
+  ]
+
   const height = grid.length
   const width = grid[0].length
   const root_coord = { i: 0, j: 0 }
