@@ -43,9 +43,22 @@ const findLargestPrimeFactor = (value: number): number => {
   return prime
 }
 
+const subarrayWithMaximumSum = (array: number[]): number => {
+  let maxSum = Number.MIN_VALUE
+  for (let i=0; i < array.length; i++) {
+    for (let j=i+1; j <= array.length; j++) {
+      const subarray = array.slice(i, j)
+      const sum = subarray.reduce((acc, curr) => acc + curr)
+      if (sum > maxSum) {
+        maxSum = sum
+      }
+    }
+  }
+  return maxSum
+}
+
 const totalWaysToSumII = (data: [number, number[]], ns: NS) => {
-  const n = data[0]
-  const s = data[1]
+  const [n, s] = data
 
   ns.tprint(`${s}`)
 
@@ -70,6 +83,25 @@ const totalWaysToSumII = (data: [number, number[]], ns: NS) => {
 
 const spiralizeMatrix = (matrix: number[][], ns: NS): number[] => {
   return [0]
+}
+
+const arrayJumpingGame = (array: number[]): number => {
+  let found = 0
+  let root_i = 0
+  let queue = [root_i]
+  while (found === 0 && queue.length > 0) {
+    let curr_i = queue.pop() as number
+    let max_jump = array[curr_i]
+    if (curr_i + max_jump >= array.length - 1)
+      found = 1
+    for (let jump=1; jump <= max_jump; jump++) {
+      const jump_i = curr_i + jump
+      if (!queue.includes(jump_i))
+        queue.unshift(jump_i)
+    }
+  }
+
+  return found
 }
 
 const algorithmicStockTraderIII = (data: number[]): number => {
@@ -187,8 +219,8 @@ const shortestPathInAGrid = (grid: number[][]): string => {
 }
 
 const findAllValidMathExpressions = (data: [string, number]): string[] => {
-  const baseString = data[0]
-  const target = data[1]
+  const [baseString, target] = data
+
   const validExpressions = []
 
   const operators = ['+', '-', '*', '']
@@ -212,12 +244,11 @@ const findAllValidMathExpressions = (data: [string, number]): string[] => {
 
 const compressionIRLECompression = (plaintext: string): string => {
   let i = 0
-  const plaintextLength = plaintext.length
   let compressed = ""
-  while (i < plaintextLength) {
+  while (i < plaintext.length) {
     const char = plaintext[i]
     let runLength = 1
-    while (i + runLength < plaintextLength && runLength < 9 && plaintext[i + runLength] === char)
+    while (i + runLength < plaintext.length && runLength < 9 && plaintext[i + runLength] === char)
       runLength = runLength + 1
     compressed = compressed.concat(`${runLength}${char}`)
     i = i + runLength
@@ -230,8 +261,7 @@ const compressionIILZDecompression = (compressed: string): string => {
   let decompressed = ""
   let i = 0
   let chunkType = 0
-  const length = compressed.length
-  while (i < length) {
+  while (i < compressed.length) {
     const l = parseInt(compressed[i])
     if (l !== 0) {
       let chunk = ""
@@ -242,9 +272,8 @@ const compressionIILZDecompression = (compressed: string): string => {
           break
         case 1:
           const x = parseInt(compressed[i + 1])
-          const decompressedLength = decompressed.length
-          chunk = decompressed.substring(decompressedLength - x).repeat(Math.floor(l / x)) +
-            decompressed.substring(decompressedLength - x, decompressedLength - x + l % x)
+          chunk = decompressed.substring(decompressed.length - x).repeat(Math.floor(l / x)) +
+            decompressed.substring(decompressed.length - x, decompressed.length - x + l % x)
           i = i + 1
           break
       }
@@ -257,10 +286,27 @@ const compressionIILZDecompression = (compressed: string): string => {
   return decompressed
 }
 
+const encryptionIIVigenereCipher = (data: [string, string]): string => {
+  const [plaintext, keyword] = data
+
+  let encrypted = ""
+
+  for (let i=0; i < plaintext.length; i++) {
+    const plainChar = plaintext[i]
+    const vigenereChar = keyword[i % keyword.length]
+    const encryptedChar = String.fromCharCode('A'.charCodeAt(0) + ((plainChar.charCodeAt(0) + vigenereChar.charCodeAt(0) - 2*'A'.charCodeAt(0)) % 26))
+    encrypted = encrypted + encryptedChar
+  }
+
+  return encrypted
+}
+
 const solvers: Solver[] = [
   { name: "Find Largest Prime Factor", func: findLargestPrimeFactor }, //95
+  { name: "Subarray with Maximum Sum", func: subarrayWithMaximumSum }, //129
   //{ name: "Total Ways to Sum II", func: totalWaysToSumII }, //198
   //{ name: "Spiralize Matrix", func: spiralizeMatrix }, //271
+  { name: "Array Jumping Game", func: arrayJumpingGame }, //368
   //{ name: "Algorithmic Stock Trader III", func: algorithmicStockTraderIII }, //651
   { name: "Minimum Path Sum in a Triangle", func: minimumPathSumInATriangle }, //789
   { name: "Unique Paths in a Grid II", func: uniquePathsInAGridII }, //892
@@ -268,6 +314,7 @@ const solvers: Solver[] = [
   { name: "Find All Valid Math Expressions", func: findAllValidMathExpressions }, //1192
   { name: "Compression I: RLE Compression", func: compressionIRLECompression }, //1486
   { name: "Compression II: LZ Decompression", func: compressionIILZDecompression }, //1564
+  { name: "Encryption II: Vigenère Cipher", func: encryptionIIVigenereCipher }, //1850
 ]
 
 const solveContract = (ns: NS, filename: string, host: string): void => {
@@ -277,6 +324,8 @@ const solveContract = (ns: NS, filename: string, host: string): void => {
   const description = ns.codingcontract.getDescription(filename, host)
   ns.tprint(`${description}`)
   const data = ns.codingcontract.getData(filename, host)
+  //const numTriesRemaining = ns.codingcontract.getNumTriesRemaining(filename, host)
+  //ns.tprint(`${numTriesRemaining}`)
   ns.tprint(`${data} ${typeof(data)}`)
   const solver = solvers.find(solver => solver.name === contractType)
   //if (contractType === "Find All Valid Math Expressions") {

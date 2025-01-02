@@ -28,23 +28,27 @@ const crackServer = (ns: NS, host: string): boolean => {
     { name: "SQLInject.exe", exe: ns.sqlinject },
   ]
 
-  let portsOpened = 0
-  let hackable = false
+  let cracked = false
 
-  for (const software of softwares) {
-    if (ns.fileExists(software.name, "home")) {
-      software.exe(host)
-      portsOpened++
+  if (host === "home") {
+    cracked = true
+  } else {
+    let portsOpened = 0
+    for (const software of softwares) {
+      if (ns.fileExists(software.name, "home")) {
+        software.exe(host)
+        portsOpened++
+      }
+    }
+
+    if (portsOpened >= ns.getServerNumPortsRequired(host)) {
+      ns.nuke(host)
+      if (ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(host))
+        cracked = true
     }
   }
 
-  if (portsOpened >= ns.getServerNumPortsRequired(host)) {
-    ns.nuke(host)
-    if (ns.getHackingLevel() >= ns.getServerRequiredHackingLevel(host))
-      hackable = true
-  }
-
-  return hackable 
+  return cracked 
 }
 
 const scpToHome = (ns: NS, host: string) => {
