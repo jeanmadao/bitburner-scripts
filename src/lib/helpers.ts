@@ -70,4 +70,38 @@ const buyServer = (ns: NS): boolean => {
   return purchased
 }
 
-export { scanDeep, crackServer, buyServer }
+const nameServers = (ns: NS): void => {
+  const purchasedServers = ns.getPurchasedServers()
+  for (let i=0; i < purchasedServers.length; i++) {
+    const currentServer = purchasedServers[i]
+    const serverName = `archmadao-${String(i).padStart(2, '0')}-${ns.getServerMaxRam(purchasedServers[i])}GB`
+    ns.renamePurchasedServer(currentServer, serverName)
+  }
+}
+
+const upgradeServers = (ns: NS): void => {
+  const purchasedServers = ns.getPurchasedServers()
+  const nbPurchasedServers = purchasedServers.length
+  let targetRam = Math.min(...purchasedServers.map(server => ns.getServerMaxRam(server))) * 2
+  let enoughMoney = true
+  while (enoughMoney && targetRam <= ns.getPurchasedServerMaxRam()) {
+    let i = 0
+    while (enoughMoney && i < nbPurchasedServers) {
+      const currentServer = purchasedServers[i]
+      if (ns.getServerMaxRam(currentServer) < targetRam) {
+        if (ns.getPurchasedServerUpgradeCost(currentServer, targetRam) <= ns.getServerMoneyAvailable("home")) {
+
+          ns.upgradePurchasedServer(currentServer, targetRam)
+          const newServerName = `archmadao-${String(i).padStart(2, '0')}-${targetRam}GB`
+          ns.renamePurchasedServer(currentServer, newServerName)
+        }
+        else
+          enoughMoney = false
+      }
+      i += 1
+    }
+    targetRam = targetRam * 2
+  }
+}
+
+export { scanDeep, crackServer, buyServer, nameServers, upgradeServers }

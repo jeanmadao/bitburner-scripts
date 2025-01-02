@@ -21,11 +21,11 @@ export async function main(ns: NS): Promise<void> {
     }
 
     if (targetServer) {
-      ns.tprint(`INFO: Deploying on ${crackedHosts.length} different servers: ${crackedHosts.join()}`)
-      ns.tprint(`INFO: Target: ${targetServer.host} MaxMoney: ${targetServer.maxMoney}`)
+      //ns.tprint(`INFO: Deploying on ${crackedHosts.length} different servers: ${crackedHosts.join()}`)
+      //ns.tprint(`INFO: Target: ${targetServer.host} MaxMoney: ${targetServer.maxMoney}`)
 
       for (const host of crackedHosts){
-        ns.tprint(`INFO: ${host}`)
+        //ns.tprint(`INFO: ${host}`)
         ns.scp(scriptName, host)
         ns.exec(scriptName, host, Math.floor((ns.getServerMaxRam(host) - ns.getServerUsedRam(host)) / ns.getScriptRam(scriptName)), targetServer.host)
       }
@@ -37,7 +37,7 @@ export async function main(ns: NS): Promise<void> {
       while (stop && i < crackedHosts.length) {
         if (!ns.scriptRunning(scriptName, crackedHosts[i])) {
           stop = false
-          ns.tprint(`INFO: Scripts are all cleared!`)
+          //ns.tprint(`INFO: Scripts are all cleared!`)
         }
         i++
       }

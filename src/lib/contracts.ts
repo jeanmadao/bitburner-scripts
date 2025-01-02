@@ -11,6 +11,11 @@ interface Position {
   path: string,
 }
 
+interface PathSum {
+  coord: Coordinates,
+  sum: number
+}
+
 type DirectionDelta = 0 | 1 | -1
 
 type DirectionChar = 'R' | 'D' | 'L' | 'U'
@@ -21,7 +26,13 @@ interface Direction {
   char: DirectionChar
 }
 
-const find_largest_prime_factor = (value: number): number => {
+
+interface Solver {
+  name: string,
+  func: (data: any) => string | number[] | any
+}
+
+const findLargestPrimeFactor = (value: number): number => {
   let prime = 2
   while (value > 1) {
     if (value % prime == 0)
@@ -32,7 +43,7 @@ const find_largest_prime_factor = (value: number): number => {
   return prime
 }
 
-const total_ways_sum_ii = (data: [number, number[]], ns: NS) => {
+const totalWaysToSumII = (data: [number, number[]], ns: NS) => {
   const n = data[0]
   const s = data[1]
 
@@ -57,39 +68,68 @@ const total_ways_sum_ii = (data: [number, number[]], ns: NS) => {
   return res
 }
 
-const spiralize_matrix = (matrix: number[][], ns: NS): number[] => {
-
+const spiralizeMatrix = (matrix: number[][], ns: NS): number[] => {
+  return [0]
 }
 
-const unique_paths_in_a_grid_ii = (grid: number[][], ns: NS): number => {
+const algorithmicStockTraderIII = (data: number[]): number => {
+  return 1
+}
+
+const minimumPathSumInATriangle = (pyramid: number[][]): number => {
+  const height = pyramid.length
+  const root: PathSum = { 
+    coord: { i: 0, j: 0},
+    sum: pyramid[0][0]
+  }
+  let queue = [root]
+  while ((queue.at(-1) as PathSum).coord.i + 1 < height) {
+    const current = queue.pop() as PathSum
+    const adjacents = [
+      {
+        coord: { i: current.coord.i + 1, j: current.coord.j },
+        sum: current.sum + pyramid[current.coord.i + 1][current.coord.j]
+      },
+      {
+        coord: { i: current.coord.i + 1, j: current.coord.j + 1 },
+        sum: current.sum + pyramid[current.coord.i + 1][current.coord.j + 1]
+      },
+    ]
+    queue = adjacents.concat(queue)
+  }
+  const sums = queue.map(pathSum => pathSum.sum)
+  return Math.min(...sums)
+}
+
+const uniquePathsInAGridII = (grid: number[][]): number => {
   const directions: Direction[] = [
     { i: 0, j: 1, char: "R"},
     { i: 1, j: 0, char: "D"},
   ]
   const height = grid.length
   const width = grid[0].length
-  const root_coord = { i: 0, j: 0 }
-  const target_coord = { i: height - 1, j: width - 1 }
-  const queue: Coordinates[] = [root_coord]
+  const rootCoord = { i: 0, j: 0 }
+  const targetCoord = { i: height - 1, j: width - 1 }
+  const queue: Coordinates[] = [rootCoord]
 
   let total = 0
 
   while (queue.length > 0) {
     const curr = queue.pop() as Coordinates
     for (const direction of directions) {
-      const new_coord = {
+      const newCoord = {
         i: curr.i + direction.i,
         j: curr.j + direction.j,
       }
 
-      if (0 <= new_coord.i && new_coord.i < height
-          && 0 <= new_coord.j && new_coord.j < width
-          && grid[new_coord.i][new_coord.j] == 0) {
+      if (0 <= newCoord.i && newCoord.i < height
+          && 0 <= newCoord.j && newCoord.j < width
+          && grid[newCoord.i][newCoord.j] == 0) {
 
-        if (new_coord.i === target_coord.i && new_coord.j === target_coord.j) {
+        if (newCoord.i === targetCoord.i && newCoord.j === targetCoord.j) {
           total += 1
         } else {
-          queue.unshift(new_coord)
+          queue.unshift(newCoord)
         }
       }
     }
@@ -97,7 +137,7 @@ const unique_paths_in_a_grid_ii = (grid: number[][], ns: NS): number => {
   return total 
 }
 
-const shortest_path_in_a_grid = (grid: number[][]): string => {
+const shortestPathInAGrid = (grid: number[][]): string => {
   const directions: Direction[] = [
     { i: 0, j: 1, char: "R"},
     { i: 1, j: 0, char: "D"},
@@ -107,9 +147,9 @@ const shortest_path_in_a_grid = (grid: number[][]): string => {
 
   const height = grid.length
   const width = grid[0].length
-  const root_coord = { i: 0, j: 0 }
-  const target_coord = { i: height - 1, j: width - 1 }
-  const queue: Position[] = [{ coord: root_coord, path: "" }]
+  const rootCoord = { i: 0, j: 0 }
+  const targetCoord = { i: height - 1, j: width - 1 }
+  const queue: Position[] = [{ coord: rootCoord, path: "" }]
   let found = false
   let path = ""
 
@@ -117,27 +157,27 @@ const shortest_path_in_a_grid = (grid: number[][]): string => {
     const curr = queue.pop() as Position
     grid[curr.coord.i][curr.coord.j] = -1
     for (const direction of directions) {
-      const new_coord = {
+      const newCoord = {
         i: curr.coord.i + direction.i,
         j: curr.coord.j + direction.j,
       }
 
-      if (0 <= new_coord.i && new_coord.i < height
-          && 0 <= new_coord.j && new_coord.j < width
-          && grid[new_coord.i][new_coord.j] == 0) {
+      if (0 <= newCoord.i && newCoord.i < height
+          && 0 <= newCoord.j && newCoord.j < width
+          && grid[newCoord.i][newCoord.j] == 0) {
 
-        const new_path = curr.path + direction.char
+        const newPath = curr.path + direction.char
 
-        const new_pos = {
-          coord: new_coord,
-          path: new_path
+        const newPos = {
+          coord: newCoord,
+          path: newPath
         }
 
-        if (new_coord.i === target_coord.i && new_coord.j === target_coord.j) {
+        if (newCoord.i === targetCoord.i && newCoord.j === targetCoord.j) {
           found = true
-          path = new_path
+          path = newPath
         } else {
-          queue.unshift(new_pos)
+          queue.unshift(newPos)
         }
       }
     }
@@ -146,15 +186,91 @@ const shortest_path_in_a_grid = (grid: number[][]): string => {
   return path
 }
 
-const solvers = [
-  { name: "Find Largest Prime Factor", func: find_largest_prime_factor }, //95
-  //{ name: "Total Ways to Sum II", func: total_ways_sum_ii }, //198
-  //{ name: "Spiralize Matrix", func: spiralize_matrix }, //271
-  { name: "Unique Paths in a Grid II", func: unique_paths_in_a_grid_ii }, //892
-  { name: "Shortest Path in a Grid", func: shortest_path_in_a_grid }, //916
+const findAllValidMathExpressions = (data: [string, number]): string[] => {
+  const baseString = data[0]
+  const target = data[1]
+  const validExpressions = []
+
+  const operators = ['+', '-', '*', '']
+  const base = operators.length
+  const nbOperators = baseString.length - 1
+  let combination = 0
+  while (combination < operators.length**nbOperators) {
+    let expression = baseString[0]
+    for (let i=0; i < nbOperators; i++) {
+      const operator = operators[Math.floor(combination / base**i) % base]
+      if (operator === '' && expression.at(-1) === '0')
+        expression = expression.substring(0, expression.length - 1)
+      expression = expression + operator + baseString[i + 1]
+    }
+    if (eval(expression) === target)
+      validExpressions.push(expression)
+    combination += 1
+  }
+  return validExpressions
+}
+
+const compressionIRLECompression = (plaintext: string): string => {
+  let i = 0
+  const plaintextLength = plaintext.length
+  let compressed = ""
+  while (i < plaintextLength) {
+    const char = plaintext[i]
+    let runLength = 1
+    while (i + runLength < plaintextLength && runLength < 9 && plaintext[i + runLength] === char)
+      runLength = runLength + 1
+    compressed = compressed.concat(`${runLength}${char}`)
+    i = i + runLength
+  }
+
+  return compressed
+}
+
+const compressionIILZDecompression = (compressed: string): string => {
+  let decompressed = ""
+  let i = 0
+  let chunkType = 0
+  const length = compressed.length
+  while (i < length) {
+    const l = parseInt(compressed[i])
+    if (l !== 0) {
+      let chunk = ""
+      switch(chunkType) {
+        case 0:
+          chunk = compressed.substring(i + 1, i + 1 + l)
+          i = i + l
+          break
+        case 1:
+          const x = parseInt(compressed[i + 1])
+          const decompressedLength = decompressed.length
+          chunk = decompressed.substring(decompressedLength - x).repeat(Math.floor(l / x)) +
+            decompressed.substring(decompressedLength - x, decompressedLength - x + l % x)
+          i = i + 1
+          break
+      }
+      decompressed = decompressed.concat(chunk)
+    }
+    i = i + 1
+    chunkType = (chunkType + 1) % 2
+  }
+
+  return decompressed
+}
+
+const solvers: Solver[] = [
+  { name: "Find Largest Prime Factor", func: findLargestPrimeFactor }, //95
+  //{ name: "Total Ways to Sum II", func: totalWaysToSumII }, //198
+  //{ name: "Spiralize Matrix", func: spiralizeMatrix }, //271
+  //{ name: "Algorithmic Stock Trader III", func: algorithmicStockTraderIII }, //651
+  { name: "Minimum Path Sum in a Triangle", func: minimumPathSumInATriangle }, //789
+  { name: "Unique Paths in a Grid II", func: uniquePathsInAGridII }, //892
+  { name: "Shortest Path in a Grid", func: shortestPathInAGrid }, //916
+  { name: "Find All Valid Math Expressions", func: findAllValidMathExpressions }, //1192
+  { name: "Compression I: RLE Compression", func: compressionIRLECompression }, //1486
+  { name: "Compression II: LZ Decompression", func: compressionIILZDecompression }, //1564
 ]
 
-const solveContract = (ns: NS, filename: string, host: string) => {
+const solveContract = (ns: NS, filename: string, host: string): void => {
   ns.tprint(`INFO: ${filename} ${host}`)
   const contractType = ns.codingcontract.getContractType(filename, host)
   ns.tprint(`${contractType}`)
@@ -163,21 +279,25 @@ const solveContract = (ns: NS, filename: string, host: string) => {
   const data = ns.codingcontract.getData(filename, host)
   ns.tprint(`${data} ${typeof(data)}`)
   const solver = solvers.find(solver => solver.name === contractType)
+  //if (contractType === "Find All Valid Math Expressions") {
+  //  ns.tprint(findAllValidMathExpressions(["123", 6], ns))
+  //  ns.tprint(findAllValidMathExpressions(["105", 6], ns))
+  //}
   if (solver) {
-    if (contractType === "Spiralize Matrix") {
-      spiralize_matrix(data, ns)
+    const reward = ns.codingcontract.attempt(solver.func(data), filename, host)
+    if (reward) {
+      const successMessage = `"${contractType}" on ${host}@${filename} solved successfully! Reward: ${reward}`
+      ns.tprint(`SUCCESS: ${successMessage}`);
+      ns.toast(successMessage, "success")
     } else {
-      //const reward = ns.codingcontract.attempt(solver.func(data), filename, host)
-      //if (reward) {
-      //  ns.tprint(`SUCCESS: "${contractType}" on ${host}@${filename} solved successfully! Reward: ${reward}`);
-      //} else {
-      //  ns.tprint(`WARN: Failed to solve "${contractType}" on ${host}@${filename}.`);
-      //}
+      const failureMessage = `Failed to solve "${contractType}" on ${host}@${filename}.`
+      ns.tprint(`WARN: ${failureMessage}`);
+      ns.toast(failureMessage, "error")
     }
   }
 }
 
-const solveAllContracts = (ns: NS) => {
+const solveAllContracts = (ns: NS): void => {
   const hosts = scanDeep(ns)
   for (const host of hosts) {
     const contracts = ns.ls(host, ".cct")
